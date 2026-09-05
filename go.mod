@@ -1,3 +1,3 @@
-module neural-net
+module github.com/jrbarbati/neural-net
 
 go 1.27

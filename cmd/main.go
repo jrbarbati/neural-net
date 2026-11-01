@@ -10,15 +10,20 @@ import (
 
 func main() {
 	layers := []layer.Config{
-		{InputLen: 5, Size: 10, ActivationFn: activation.ReLU},
-		{InputLen: 10, Size: 15, ActivationFn: activation.ReLU},
-		{InputLen: 15, Size: 5, ActivationFn: activation.ReLU},
-		{InputLen: 5, Size: 2, ActivationFn: activation.Sigmoid},
+		{InputLen: 784, Size: 16, ActivationFn: activation.ReLU},
+		{InputLen: 16, Size: 16, ActivationFn: activation.ReLU},
+		{InputLen: 16, Size: 10, ActivationFn: activation.Sigmoid},
 	}
 
 	n := network.New(layers)
 
-	categorize, err := n.Categorize([]float64{0, 0, 0, 0, 0})
+	inputs := make([][]float64, 784)
+
+	for i := range inputs {
+		inputs[i] = []float64{0}
+	}
+
+	categorize, err := n.Categorize(inputs)
 
 	if err != nil {
 		fmt.Println(err.Error())

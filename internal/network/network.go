@@ -16,7 +16,7 @@ func New(layers []layer.Config) *Network {
 	}
 }
 
-func (n *Network) Categorize(inputs []float64) ([]float64, error) {
+func (n *Network) Categorize(inputs [][]float64) ([][]float64, error) {
 	return n.forwardPass(inputs)
 }
 
@@ -24,12 +24,12 @@ func (n *Network) Train(inputBatch [][]float64) error {
 	return nil
 }
 
-func (n *Network) forwardPass(inputs []float64) ([]float64, error) {
+func (n *Network) forwardPass(inputs [][]float64) ([][]float64, error) {
 	networkInput := inputs
 	var err error
 
 	for _, l := range n.Layers {
-		networkInput, err = l.ForwardPass(networkInput)
+		networkInput, err = l.ActivationValues(networkInput)
 
 		if err != nil {
 			return nil, fmt.Errorf("error in forward pass: %w", err)

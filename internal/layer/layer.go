@@ -2,14 +2,16 @@ package layer
 
 import (
 	"fmt"
+	"math/rand"
 
 	"github.com/jrbarbati/neural-net/internal/activation"
 	"github.com/jrbarbati/neural-net/internal/matrix"
-	"github.com/jrbarbati/neural-net/internal/neuron"
 )
 
 type Layer struct {
-	neurons []*neuron.Neuron
+	weights      [][]float64
+	biases       [][]float64
+	activationFn activation.Function
 }
 
 type Config struct {
@@ -19,66 +21,41 @@ type Config struct {
 }
 
 func New(config Config) *Layer {
-	return &Layer{
-		neurons: build(config.Size, config.InputLen),
+	w := make([][]float64, config.Size)
+	b := make([][]float64, config.Size)
+
+	for i := range w {
+		w[i] = make([]float64, config.InputLen)
+		b[i] = make([]float64, 1)
+
+		for j := range w[i] {
+			w[i][j] = rand.Float64()
+		}
+		b[i][0] = 0
 	}
+
+	return &Layer{w, b, config.ActivationFn}
 }
 
-func (l *Layer) ForwardPass(inputs []float64) ([]float64, error) {
-	layerWeights := l.neuronWeights()
-	layerBiases := l.neuronBiases()
-
-	inputCol := make([][]float64, len(inputs))
-	for i, v := range inputs {
-		inputCol[i] = []float64{v}
-	}
-
-	weighted, err := matrix.Multiply(layerWeights, inputCol)
+// ActivationValues takes the activation values from the previous layer and performs the necessary matrix math to output
+// its own activation values
+func (l *Layer) ActivationValues(activations [][]float64) ([][]float64, error) {
+	result, err := matrix.Multiply(l.weights, activations)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to update weights: %w", err)
+		return nil, fmt.Errorf("error in matrix multiplication: %w", err)
 	}
 
-	z := matrix.Transpose(weighted)
-
-	summed, err := matrix.Add(z, layerBiases)
+	activationValues, err := matrix.Add(result, l.biases)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to add bias: %w", err)
+		return nil, fmt.Errorf("error in matrix addition: %w", err)
 	}
 
-	return summed, nil
+	return l.activationFn.Apply(activationValues), nil
 }
 
-func (l *Layer) BackPropagation(inputs []float64, loss float64) {
-}
+// UpdateWeights calculates how this layer's weights should update based on the loss
+func (l *Layer) UpdateWeights(loss []float64) {
 
-func (l *Layer) neuronWeights() [][]float64 {
-	layerWeights := make([][]float64, len(l.neurons))
-
-	for i := range l.neurons {
-		layerWeights[i] = l.neurons[i].Weights
-	}
-
-	return layerWeights
-}
-
-func (l *Layer) neuronBiases() []float64 {
-	layerBiases := make([]float64, len(l.neurons))
-
-	for i := range l.neurons {
-		layerBiases[i] = l.neurons[i].Bias
-	}
-
-	return layerBiases
-}
-
-func build(size, inputLen int) []*neuron.Neuron {
-	neurons := make([]*neuron.Neuron, size)
-
-	for i := range size {
-		neurons[i] = neuron.New(inputLen)
-	}
-
-	return neurons
 }

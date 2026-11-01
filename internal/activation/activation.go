@@ -1,27 +1,31 @@
 package activation
 
-import "math"
+import (
+	"math"
+)
 
 type Function struct {
-	Apply      func([]float64) []float64
-	Derivative func([]float64) []float64
+	Apply      func([][]float64) [][]float64
+	Derivative func([][]float64) [][]float64
 }
 
 var Sigmoid = Function{
-	Apply: func(x []float64) []float64 {
-		result := make([]float64, len(x))
+	Apply: func(x [][]float64) [][]float64 {
+		result := make([][]float64, len(x))
 
-		for i, num := range x {
-			result[i] = 1 / (1 + math.Exp(-num))
+		for i := range x {
+			num := x[i][0]
+			result[i] = []float64{1 / (1 + math.Exp(-num))}
 		}
 
 		return result
 	},
-	Derivative: func(x []float64) []float64 {
-		result := make([]float64, len(x))
+	Derivative: func(x [][]float64) [][]float64 {
+		result := make([][]float64, len(x))
 
-		for i, num := range x {
-			result[i] = num * (1 - num)
+		for i := range x {
+			num := x[i][0]
+			result[i] = []float64{num * (1 - num)}
 		}
 
 		return result
@@ -29,20 +33,22 @@ var Sigmoid = Function{
 }
 
 var Tanh = Function{
-	Apply: func(x []float64) []float64 {
-		result := make([]float64, len(x))
+	Apply: func(x [][]float64) [][]float64 {
+		result := make([][]float64, len(x))
 
-		for i, num := range x {
-			result[i] = (math.Exp(num) - math.Exp(-num)) / (math.Exp(num) + math.Exp(-num))
+		for i := range x {
+			num := x[i][0]
+			result[i] = []float64{(math.Exp(num) - math.Exp(-num)) / (math.Exp(num) + math.Exp(-num))}
 		}
 
 		return result
 	},
-	Derivative: func(x []float64) []float64 {
-		result := make([]float64, len(x))
+	Derivative: func(x [][]float64) [][]float64 {
+		result := make([][]float64, len(x))
 
-		for i, num := range x {
-			result[i] = 1 - num*num
+		for i := range x {
+			num := x[i][0]
+			result[i] = []float64{1 - num*num}
 		}
 
 		return result
@@ -50,23 +56,25 @@ var Tanh = Function{
 }
 
 var ReLU = Function{
-	Apply: func(x []float64) []float64 {
-		result := make([]float64, len(x))
+	Apply: func(x [][]float64) [][]float64 {
+		result := make([][]float64, len(x))
 
-		for i, num := range x {
-			result[i] = math.Max(0, num)
+		for i := range x {
+			num := x[i][0]
+			result[i] = []float64{math.Max(0, num)}
 		}
 
 		return result
 	},
-	Derivative: func(x []float64) []float64 {
-		result := make([]float64, len(x))
+	Derivative: func(x [][]float64) [][]float64 {
+		result := make([][]float64, len(x))
 
-		for i, num := range x {
+		for i := range x {
+			num := x[i][0]
 			if num > 0 {
-				result[i] = 1
+				result[i] = []float64{1}
 			} else {
-				result[i] = 0
+				result[i] = []float64{0}
 			}
 		}
 
@@ -75,27 +83,29 @@ var ReLU = Function{
 }
 
 var LeakyReLU = Function{
-	Apply: func(x []float64) []float64 {
-		result := make([]float64, len(x))
+	Apply: func(x [][]float64) [][]float64 {
+		result := make([][]float64, len(x))
 
-		for i, num := range x {
+		for i := range x {
+			num := x[i][0]
 			if num > 0 {
-				result[i] = num
+				result[i] = []float64{num}
 			} else {
-				result[i] = 0.01 * num
+				result[i] = []float64{0.01 * num}
 			}
 		}
 
 		return result
 	},
-	Derivative: func(x []float64) []float64 {
-		result := make([]float64, len(x))
+	Derivative: func(x [][]float64) [][]float64 {
+		result := make([][]float64, len(x))
 
-		for i, num := range x {
+		for i := range x {
+			num := x[i][0]
 			if num > 0 {
-				result[i] = 1
+				result[i] = []float64{1}
 			} else {
-				result[i] = 0.01
+				result[i] = []float64{0.01}
 			}
 		}
 

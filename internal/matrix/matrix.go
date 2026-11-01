@@ -4,52 +4,79 @@ import (
 	"errors"
 )
 
-func Add(a, b []float64) ([]float64, error) {
+// Add performs matrix addition on a 2d array. Can return an error if the dimensions(a) != dimensions(b)
+// Computes value and updates input array a
+func Add(a, b [][]float64) ([][]float64, error) {
+	if a == nil || b == nil {
+		return nil, errors.New("nil input")
+	}
+
 	if len(a) != len(b) {
-		return nil, errors.New("matrix dimensions do not match")
+		return nil, errors.New("dimension mismatch")
 	}
-
-	summed := make([]float64, len(a))
 
 	for i := range a {
-		summed[i] = a[i] + b[i]
-	}
-
-	return summed, nil
-}
-
-func Multiply(a, b [][]float64) ([][]float64, error) {
-	if len(a[0]) != len(b) {
-		return nil, errors.New("matrix dimensions do not match")
-	}
-
-	var result [][]float64
-
-	for i := range a {
-		var row []float64
-
-		for col := range b[0] {
-			var sum float64
-
-			for k := range b {
-				sum += a[i][k] * b[k][col]
-			}
-
-			row = append(row, sum)
+		if a[i] == nil || b[i] == nil {
+			return nil, errors.New("nil input")
 		}
 
-		result = append(result, row)
+		if len(a[i]) != len(b[i]) {
+			return nil, errors.New("dimension mismatch")
+		}
+
+		for j := range a[i] {
+			a[i][j] += b[i][j]
+		}
+	}
+
+	return a, nil
+}
+
+// Multiply performs matrix multiplication on the 2d arrays. Can return error if the dimensions cannot be multiplied.
+// Computes value and returns entirely new array
+func Multiply(a, b [][]float64) ([][]float64, error) {
+	if a == nil || b == nil || len(a) == 0 || len(b) == 0 || len(a[0]) != len(b) {
+		return nil, errors.New("invalid input")
+	}
+
+	result := make([][]float64, len(a))
+
+	for i := range result {
+		result[i] = make([]float64, len(b[0]))
+	}
+
+	for i := range a {
+		for j := range b[0] {
+			for k := range b {
+				result[i][j] += a[i][k] * b[k][j]
+			}
+		}
 	}
 
 	return result, nil
 }
 
-func Transpose(a [][]float64) []float64 {
-	transposed := make([]float64, len(a))
-
-	for i := range a {
-		transposed[i] = a[i][0]
+// Transpose produces an NxM array from an MxN array
+func Transpose(a [][]float64) ([][]float64, error) {
+	if a == nil || len(a) == 0 || a[0] == nil {
+		return nil, errors.New("invalid input")
 	}
 
-	return transposed
+	result := make([][]float64, len(a[0]))
+
+	for i := range result {
+		result[i] = make([]float64, len(a))
+	}
+
+	for i := range a {
+		if a[i] == nil || len(a[i]) == 0 || len(a[i]) != len(a[0]) {
+			return nil, errors.New("invalid input")
+		}
+
+		for j := range a[i] {
+			result[j][i] = a[i][j]
+		}
+	}
+
+	return result, nil
 }

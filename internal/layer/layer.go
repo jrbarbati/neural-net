@@ -31,7 +31,7 @@ func New(config Config) *Layer {
 		for j := range w[i] {
 			w[i][j] = rand.Float64()
 		}
-		b[i][0] = 0
+		b[i][0] = rand.Float64()
 	}
 
 	return &Layer{w, b, config.ActivationFn}

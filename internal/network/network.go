@@ -20,7 +20,7 @@ func (n *Network) Categorize(inputs [][]float64) ([][]float64, error) {
 	return n.forwardPass(inputs)
 }
 
-func (n *Network) Train(inputBatch [][]float64) error {
+func (n *Network) Train(data [][]float64) error {
 	return nil
 }
 
